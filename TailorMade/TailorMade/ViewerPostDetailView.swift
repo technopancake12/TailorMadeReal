@@ -177,7 +177,6 @@ struct ViewerInstagramPostView: View {
     
     // Function to update likes in Firestore
     private func updateLikesInFirestore() {
-        let userId = viewModel.currentUser?.id ?? ""
         let postId = post.pid
         let db = Firestore.firestore()
         
@@ -186,14 +185,14 @@ struct ViewerInstagramPostView: View {
         
         if isLiked {
             // Add user's ID to the likes collection
-            db.collection("users").document(userId).collection("posts").document(postId).collection("likes").document(userId).setData(["liked": true]) { error in
+            db.collection("posts").document(postId).collection("likes").document(viewModel.currentUser?.id ?? "").setData(["liked": true]) { error in
                 if let error = error {
                     print("Error updating like status: \(error.localizedDescription)")
                 }
             }
         } else {
             // Remove user's ID from the likes collection
-            db.collection("users").document(userId).collection("posts").document(postId).collection("likes").document(userId).delete { error in
+            db.collection("posts").document(postId).collection("likes").document(viewModel.currentUser?.id ?? "").delete { error in
                 if let error = error {
                     print("Error updating like status: \(error.localizedDescription)")
                 }
@@ -223,8 +222,6 @@ struct ViewerInstagramPostView: View {
             }
         }
     }
-    
-    // Function to check if the current user has bookmarked the post
     private func fetchBookmarkStatus() {
         let userId = viewModel.currentUser?.id ?? ""
         let postId = post.pid
@@ -240,30 +237,24 @@ struct ViewerInstagramPostView: View {
             isBookmarked = snapshot?.exists ?? false
         }
     }
-    // Function to check if the current user has liked the post
+    
+    // Function to fetch like status from Firestore
     private func fetchLikeStatus() {
-        let userId = viewModel.currentUser?.id ?? ""
         let postId = post.pid
         let db = Firestore.firestore()
         
         // Fetch like status from Firestore
-        db.collection("users").document(userId).collection("posts").document(postId).collection("likes").document(userId).getDocument { snapshot, error in
+        db.collection("posts").document(postId).collection("likes").document(viewModel.currentUser?.id ?? "").getDocument { snapshot, error in
             if let error = error {
                 print("Error fetching like status: \(error.localizedDescription)")
                 return
             }
             
-            if let _ = snapshot?.data() {
-                // User has liked the post
-                isLiked = true
-            } else {
-                // User has not liked the post
-                isLiked = false
-            }
+            isLiked = snapshot?.exists ?? false
         }
         
         // Fetch like count from Firestore
-        db.collection("users").document(userId).collection("posts").document(postId).collection("likes").getDocuments { snapshot, error in
+        db.collection("posts").document(postId).collection("likes").getDocuments { snapshot, error in
             if let error = error {
                 print("Error fetching like count: \(error.localizedDescription)")
                 return
@@ -305,14 +296,12 @@ struct ViewerInstagramPostView: View {
         }
     }
 
-
     // Function to fetch comments from Firestore
     private func fetchComments() {
-        let userId = post.userId
         let postId = post.pid
         let db = Firestore.firestore()
 
-        db.collection("users").document(userId).collection("posts").document(postId).collection("comments").addSnapshotListener { (querySnapshot, error) in
+        db.collection("posts").document(postId).collection("comments").addSnapshotListener { (querySnapshot, error) in
             guard let snapshot = querySnapshot else {
                 print("Error fetching comments: \(error?.localizedDescription ?? "Unknown error")")
                 return
@@ -331,3 +320,5 @@ struct ViewerInstagramPostView: View {
         }
     }
 }
+
+
