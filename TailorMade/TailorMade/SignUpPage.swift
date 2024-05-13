@@ -7,6 +7,104 @@
 
 import SwiftUI
 
+struct Item: Identifiable { // defining items for table
+    let id = UUID()
+    let title: String
+    let imageName: String
+    var isSelected: Bool = false
+}
+
+struct BrandInterest: View {
+    @State private var items: [Item] = [
+        //Table of brands for user to select
+        Item(title: "Adidas", imageName: "adidas"),
+        Item(title: "Nike", imageName: "nike"),
+        Item(title: "Comme Des Garcons", imageName: "commedesgarcons"),
+        Item(title: "Stussy", imageName: "stussy"),
+        Item(title: "ACOLDWALL", imageName: "acoldwall"),
+        Item(title: "Off-White", imageName: "offwhite"),
+        Item(title: "Supreme", imageName: "supreme"),
+        Item(title: "ARCTERYX", imageName: "arcteryx"),
+        Item(title: "Champion", imageName: "champion"),
+        Item(title: "JADED LONDON", imageName: "jadedlondon"),
+        Item(title: "Vans", imageName: "vans"),
+        Item(title: "Doc Martens", imageName: "docmartens"),
+        Item(title: "Maison Margiela", imageName: "imageX"),
+        Item(title: "Rick Owens", imageName: "imageX"),
+        Item(title: "ISSEY MIYAKE", imageName: "imageX"),
+        Item(title: "Suicoke", imageName: "imageX"),
+        Item(title: "Vivienne Westwood", imageName: "imageX"),
+        Item(title: "MIHARA YASUHIRO", imageName: "imageX"),
+        Item(title: "Gentle Monster", imageName: "imageX"),
+        Item(title: "NOMAINTENANCE", imageName: "imageX"),
+        Item(title: "New Balance", imageName: "imageX"),
+        Item(title: "KAPITAL", imageName: "imageX"),
+        Item(title: "Evisu", imageName: "imageX")
+    ]
+    @State private var navigateToSignUpPage = false
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                LazyVStack {
+                    ForEach(items) { item in
+                        ItemRow(item: item)
+                    }
+                }
+            }
+            .navigationTitle("Which brands are you most interested in?")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing:
+                Button("Done") {
+                    navigateToSignUpPage = true
+                }
+                .sheet(isPresented: $navigateToSignUpPage) {
+                    SignUpPage()
+                }
+            )
+        }
+    }
+}
+
+struct ItemRow: View {
+    @State private var selectedItems: Set<UUID> = Set()
+    let item: Item
+    
+    var body: some View { //definition of items in table
+        HStack {
+            Image(item.imageName)
+                .resizable()
+                .frame(width: 50, height: 50)
+            Text(item.title)
+            Spacer()
+            if selectedItems.contains(item.id) {
+                Image(systemName: "checkmark.square.fill")
+                    .foregroundColor(.blue)
+            } else {
+                Image(systemName: "square")
+            }
+        }
+        .onTapGesture { //track if the user selects the brand
+            toggleSelection(for: item)
+        }
+    }
+    
+    func toggleSelection(for item: Item) {
+        if selectedItems.contains(item.id) {
+            selectedItems.remove(item.id)
+        } else {
+            selectedItems.insert(item.id)
+        }
+    }
+}
+
+struct BrandInterest_Previews: PreviewProvider {
+    static var previews: some View {
+        BrandInterest()
+    }
+}
+
+
 // SignUpPage view
 struct SignUpPage: View {
     
@@ -17,6 +115,7 @@ struct SignUpPage: View {
     @State private var confirmPassword = ""
     @State private var profileImageUrl = "download"
     @State private var bio = ""
+    @State private var navigateToBrandInterest = false  // Added new state variable
     
     @EnvironmentObject var viewModel: AuthViewModel
     
@@ -90,10 +189,15 @@ struct SignUpPage: View {
                         }
                     }
                     
+                    
+                    
+                    
+
                     // Sign Up button - Hoang
                     Button("Sign Up") {
                         Task {
                             try await viewModel.CreateUser(withEmail: email, password: password, fullname: fullname, Username: Username, profileImageUrl: profileImageUrl, bio: bio)
+                            navigateToBrandInterest = true   // Set navigateToBrandInterest to true
                         }
                     }
                     .foregroundColor(.white)
@@ -102,6 +206,9 @@ struct SignUpPage: View {
                     .cornerRadius(10)
                     .disabled(!formIsValid)
                     .opacity(formIsValid ? 1.0 : 0.5)
+                    .fullScreenCover(isPresented: $navigateToBrandInterest) {  // Present BrandInterest view
+                        BrandInterest()
+                    }
                         
                     // Navigation link to log in page - Hoang
                     NavigationLink() {

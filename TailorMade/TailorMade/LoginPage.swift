@@ -82,7 +82,7 @@ struct LoginPage: View {
                     
                     // Navigation link to sign-up page - Nathan
                     NavigationLink() {
-                        SignUpPage()
+                        BrandInterest()
                             .navigationBarBackButtonHidden(true)
                     } label: {
                         HStack(spacing: 3){
