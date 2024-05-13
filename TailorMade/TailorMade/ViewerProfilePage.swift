@@ -184,26 +184,6 @@ struct ViewerProfileHeaderView: View {
                         .font(.footnote)
                 }
                 
-                VStack(alignment: .center) {
-                    Text("1.5M")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 2)
-                    Text("Followers")
-                        .foregroundColor(.gray)
-                        .font(.footnote)
-                }
-                
-                VStack(alignment: .center) {
-                    Text("500")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 2)
-                    Text("Following")
-                        .foregroundColor(.gray)
-                        .font(.footnote)
-                }
-                
                 Spacer()
             }
             .padding(.top, 8)

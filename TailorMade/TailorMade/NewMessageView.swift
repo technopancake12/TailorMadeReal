@@ -1,5 +1,3 @@
-
-
 // A SwiftUI view for composing and sending new messages.
 import SwiftUI
 struct NewMessageView: View {

@@ -75,7 +75,7 @@ struct SwipePage: View {
                             WebImage(url: URL(string: userPosts[index]))
                                 .resizable()
                                 .scaledToFill()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .frame(maxWidth: 300, maxHeight: 300)
                                 .clipped()
                                 .tag(index)
                         }
@@ -206,6 +206,10 @@ struct SwipeOverlayView<Content: View>: View {
                     .foregroundColor(.red)
                     .padding()
                 Spacer()
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 50))
+                    .foregroundColor(.green)
+                    .padding()
                 action()
                 Spacer()
             }

@@ -39,13 +39,14 @@ struct OfferingView: View {
                 // Implement your offer submission logic here
                 submitOffer()
             }) {
-                Text("Send Offer")
-                    .font(.headline)
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .cornerRadius(8)
-            }
+                NavigationLink(destination: PaymentPortal()){
+                    Text("Send Offer")
+                        .font(.headline)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }}
             .padding()
             
             Spacer()
