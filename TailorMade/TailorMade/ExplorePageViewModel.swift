@@ -13,6 +13,7 @@ import SDWebImageSwiftUI
 class ExplorePageViewModel: ObservableObject {
     // keep track of all the images we got
     @Published var images = [ImageModel]()
+    @Published var storyImages = [StoryImageModel]()
     @Published var currentPage = 1
     // check if there are more images
     @Published var hasMorePages = true
@@ -92,7 +93,66 @@ class ExplorePageViewModel: ObservableObject {
         }
     }
 
+    func populateStories(page: Int, numberOfUsers: Int = 25) {
+        var usersQuery = db.collection("users").limit(to: numberOfUsers)
+        
+        // fetch users' data based on the query
+        usersQuery.getDocuments { [weak self] snapshot, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error getting users: \(error)")
+                return
+            }
+            
+            guard let documents = snapshot?.documents else {
+                print("No users found")
+                return
+            }
+            
+            // loop through users' data
+            for document in documents {
+                let userID = document.documentID
+                
+                // Skip users who have already been processed
+                if self.skippedUsers.contains(userID) {
+                    continue
+                }
+                
+                let storiesRef = self.db.collection("users").document(userID).collection("stories")
+                
+                // Fetch posts for the user
+                storiesRef.getDocuments { storiesSnapshot, storiesError in
+                    if let storiesError = storiesError {
+                        print("Error fetching stories for user \(userID): \(storiesError)")
+                        return
+                    }
+                    
+                    guard let storiesDocuments = storiesSnapshot?.documents else {
+                        print("No stories found for user \(userID)")
+                        return
+                    }
+                
+                    
+                    // Print the "imageUrl" for each document in "posts" for the user
+                    for storyDocument in storiesDocuments {
+                        if let imageUrl = storyDocument.data()["imageUrl"] as? String,
+                           let pid = storyDocument.documentID as? String,
+                           let userId = storyDocument.data()["userId"] as? String{
+                           // print("Found \(userID) posts: \(pid)")
+                            
+                            // Add imageUrl to images list
+                            DispatchQueue.main.async {
+                                self.storyImages.append(StoryImageModel(url: URL(string: imageUrl)!, pid: pid, userId: userId ))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    
     
     func searchUserByUsername(username: String) {
         let usersRef = db.collection("users")
@@ -170,6 +230,20 @@ class ExplorePageViewModel: ObservableObject {
             self.userId = userId
             self.likes = likes
             self.commentCount = commentCount
+        }
+    }
+    
+    struct StoryImageModel: Identifiable, Hashable {
+        let id = UUID() // give each image a unique ID
+        let url: URL
+        let pid: String
+        let userId: String
+
+        // Add this initializer
+        init(url: URL, pid: String, userId: String) {
+            self.url = url
+            self.pid = pid
+            self.userId = userId
         }
     }
 }

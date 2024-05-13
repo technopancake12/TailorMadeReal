@@ -18,7 +18,7 @@ struct NewMessageView: View {
 
                                 Button("Create Conversation") { // Button for creating new conversation
                                 let viewModel = DMViewModel(receiverId: recipientId)
-                                    viewModel.sendNewMessage(receiverId: recipientId, content: messageContent)
+                                    viewModel.sendNewMessage(receiverEmail: recipientId, content: messageContent)
 
                                     presentationMode.wrappedValue.dismiss()
                                 }

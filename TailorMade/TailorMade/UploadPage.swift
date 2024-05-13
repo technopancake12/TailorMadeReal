@@ -33,6 +33,7 @@ struct UploadPage: View {
     @State private var selectedImage: UIImage?
     @State private var showImagePicker: Bool = false
     @State private var userPosts: [Post] = []
+    @State private var userStories: [Story] = []
     @State private var caption: String = ""
     @State private var selectedStyle: FashionStyle?
     @State private var selectedCategory: Category?
@@ -77,42 +78,56 @@ struct UploadPage: View {
                     .padding()
 
                 NavigationLink(destination: styleSelectionView, isActive: $isStyleDropdownVisible) {
-                                    EmptyView()
-                                }
-                                Button(action: {
-                                    isStyleDropdownVisible.toggle()
-                                }) {
-                                    Text("Select Style: \(selectedStyle?.rawValue ?? "")")
-                                        .foregroundColor(.blue)
-                                        .padding()
-                                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
-                                }
+                    EmptyView()
+                }
+                Button(action: {
+                    isStyleDropdownVisible.toggle()
+                }) {
+                    Text("Select Style: \(selectedStyle?.rawValue ?? "")")
+                        .foregroundColor(.blue)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
+                }
                 .pickerStyle(MenuPickerStyle())
                 .padding()
 
                 NavigationLink(destination: categorySelectionView, isActive: $isCategoryDropdownVisible) {
-                                    EmptyView()
-                                }
-                                Button(action: {
-                                    isCategoryDropdownVisible.toggle()
-                                }) {
-                                    Text("Select Category: \(selectedCategory?.rawValue ?? "")") // Button to choose clothing category - Sharvay Ajit
-                                        .foregroundColor(.blue)
-                                        .padding()
-                                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
-                                }
+                    EmptyView()
+                }
+                Button(action: {
+                    isCategoryDropdownVisible.toggle()
+                }) {
+                    Text("Select Category: \(selectedCategory?.rawValue ?? "")") // Button to choose clothing category - Sharvay Ajit
+                        .foregroundColor(.blue)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
+                }
                 .pickerStyle(MenuPickerStyle())
                 .padding()
 
-                Button("Upload") {
-                    uploadPhoto()
+                HStack {
+                    Button("Upload to Story") {
+                        uploadStory()
+                    }
+                    .padding()
+                    .foregroundColor(.blue)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.blue, lineWidth: 2)
+                    )
+
+                    Spacer()
+
+                    Button("Upload") {
+                        uploadPhoto()
+                    }
+                    .padding()
+                    .foregroundColor(.blue)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.blue, lineWidth: 2)
+                    )
                 }
-                .padding()
-                .foregroundColor(.blue)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.blue, lineWidth: 2)
-                )
             }
             .navigationBarTitle("New Post", displayMode: .inline)
             .padding()
@@ -146,11 +161,43 @@ struct UploadPage: View {
                     // Get the download URL for the photo
                     photoRef.downloadURL { (url, error) in
                         guard let photoUrl = url else {
-                            
                             return
                         }
 
                         savePhotoInfoToFirestore(userId: userId, photoUrl: photoUrl)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func uploadStory() {
+        guard let selectedImage = selectedImage, let userId = Auth.auth().currentUser?.uid else {
+            // Handle case where no image is selected or user ID is unavailable
+            return
+        }
+
+        // Upload to Firebase Storage
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        let photoRef = storageRef.child("user_photos/\(userId)/\(UUID().uuidString).jpg")
+
+        if let imageData = selectedImage.jpegData(compressionQuality: 0.5) {
+            let metadata = StorageMetadata()
+            metadata.contentType = "image/jpeg"
+
+            photoRef.putData(imageData, metadata: metadata) { (_, error) in
+                if let error = error {
+                    // Handle error uploading photo
+                    print("Error uploading photo: \(error)")
+                } else {
+                    // Get the download URL for the photo
+                    photoRef.downloadURL { (url, error) in
+                        guard let photoUrl = url else {
+                            return
+                        }
+
+                        saveStoryInfoToFirestore(userId: userId, photoUrl: photoUrl)
                     }
                 }
             }
@@ -197,23 +244,56 @@ struct UploadPage: View {
         }
     }
     
-    private var styleSelectionView: some View {
-            VStack {
-                ForEach(FashionStyle.allCases, id: \.self) { style in
-                    Button(action: {
-                        selectedStyle = style
-                        isStyleDropdownVisible = false
-                    }) {
-                        Text(style.rawValue)
-                            .foregroundColor(selectedStyle == style ? .blue : .black)
-                            .padding()
-                    }
-                    .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
+    private func saveStoryInfoToFirestore(userId: String, photoUrl: URL) {
+        do {
+            let db = Firestore.firestore()
+
+            let postDocument = db.collection("users").document(userId).collection("stories").document() //added category field - Sharvay Ajit
+            let postInfo: [String: Any] = [
+                "imageUrl": photoUrl.absoluteString,
+                "userId": userId,
+            ]
+
+            postDocument.setData(postInfo) { error in
+                if let error = error {
+                    // Handle error saving post info to Firestore
+                    print("Error saving post info to Firestore: \(error)")
+                } else {
+                    // Create a Post instance with required parameters
+                    let newStory = Story(
+                        pid: postDocument.documentID as? String ?? "",
+                        imageUrl: postInfo["imageUrl"] as? String ?? "",
+                        userId: postInfo["userId"] as? String ?? ""
+                    )
+
+                    // Append the new post to the userPosts array
+                    userStories.append(newStory)
+
+                    print("Post uploaded and info saved successfully")
                 }
             }
-            .padding()
-            .navigationBarTitle("Select Style", displayMode: .inline)
+        } catch {
+            print("Failed to save with error \(error.localizedDescription)")
         }
+    }
+    
+    private var styleSelectionView: some View {
+        VStack {
+            ForEach(FashionStyle.allCases, id: \.self) { style in
+                Button(action: {
+                    selectedStyle = style
+                    isStyleDropdownVisible = false
+                }) {
+                    Text(style.rawValue)
+                        .foregroundColor(selectedStyle == style ? .blue : .black)
+                        .padding()
+                }
+                .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 1))
+            }
+        }
+        .padding()
+        .navigationBarTitle("Select Style", displayMode: .inline)
+    }
     //New view to select the category -Sharvay Ajit
     private var categorySelectionView: some View {
             VStack {

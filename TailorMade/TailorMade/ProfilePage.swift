@@ -21,6 +21,21 @@ struct Post: Identifiable,Decodable, Hashable {
         self.commentCount = commentCount
     }
 }
+
+struct Story: Identifiable,Decodable, Hashable {
+    var id = UUID()
+    var pid: String
+    var imageUrl: String
+    var userId: String
+
+    
+    init(pid: String, imageUrl: String, userId: String) {
+        self.pid = pid
+        self.imageUrl = imageUrl
+        self.userId = userId
+    }
+}
+
 struct Comment: Identifiable {
     var id = UUID()
     var commentId: String

@@ -153,7 +153,7 @@ struct DM_Page: View {
                             if viewModel.isConversationExisting() {
                                 viewModel.sendMessage(to: receiverId, content: newMessageText)
                             } else {
-                                viewModel.sendNewMessage(receiverId: receiverId, content: newMessageText)
+                                viewModel.sendNewMessage(receiverEmail: receiverId, content: newMessageText)
                             }
                             newMessageText = ""
                         }) {

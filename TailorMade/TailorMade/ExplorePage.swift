@@ -14,6 +14,9 @@ struct ExplorePage: View {
     @State private var selectedUserID: String = "" // Change the type to String
     @State private var navigateToSelectedProfilePage = false
     
+    @State private var selectedStory: Post?
+    @State private var isImageFullScreen = false
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -21,6 +24,49 @@ struct ExplorePage: View {
                     selectedUserID = userID // Update selectedUserID directly
                     navigateToSelectedProfilePage = true
                 })
+                
+                ScrollViewReader { scrollProxy in
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 1) {
+                            ForEach(viewModel.storyImages) { image in
+                                AsyncImage(url: image.url) { phase in
+                                    switch phase {
+                                    case .empty:
+                                        ProgressView()
+                                    case .success(let loadedImage):
+                                        loadedImage
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: 70, height: 70)
+                                            .clipShape(Circle())
+                                            .onTapGesture {
+                                                //
+                                                
+                                            }
+                                    case .failure:
+                                        Image(systemName: "photo")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: (UIScreen.main.bounds.width - 40) / 3, height: 120)
+                                    }
+                                }
+                                .onTapGesture {
+                                    
+                                    
+                                }
+                                .onAppear {
+                                    //if image == viewModel.storyImages.last {
+                                      //  viewModel.populateStories(page: viewModel.currentPage + 1)
+                                    //}
+                                }
+                            }
+                        }
+                    }
+                    .onAppear {
+                        viewModel.populateStories(page: 1)
+                    }
+                }
+                
                 ScrollViewReader { scrollProxy in
                     ScrollView {
                         LazyVGrid(columns: [GridItem(spacing: 1), GridItem(spacing: 1), GridItem(spacing: 1)]) {
