@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2EF5DC492BF1A59300BA3321 /* BrandInterest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EF5DC482BF1A59300BA3321 /* BrandInterest.swift */; };
 		62C2C0D62BEB0EC5008B2D3F /* TailorMadeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C2C0D52BEB0EC5008B2D3F /* TailorMadeApp.swift */; };
 		62C2C0D82BEB0EC5008B2D3F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C2C0D72BEB0EC5008B2D3F /* ContentView.swift */; };
 		62C2C0DA2BEB0EC7008B2D3F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62C2C0D92BEB0EC7008B2D3F /* Assets.xcassets */; };
@@ -94,6 +95,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2EF5DC482BF1A59300BA3321 /* BrandInterest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandInterest.swift; sourceTree = "<group>"; };
 		62C2C0D22BEB0EC5008B2D3F /* TailorMade.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TailorMade.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62C2C0D52BEB0EC5008B2D3F /* TailorMadeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TailorMadeApp.swift; sourceTree = "<group>"; };
 		62C2C0D72BEB0EC5008B2D3F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -225,6 +227,7 @@
 				62C2C1042BEB0FE7008B2D3F /* DrawingView.swift */,
 				62C2C1062BEB101E008B2D3F /* LoginPage.swift */,
 				62C2C1082BEB103F008B2D3F /* SignUpPage.swift */,
+				2EF5DC482BF1A59300BA3321 /* BrandInterest.swift */,
 				62C2C10A2BEB1058008B2D3F /* ProfilePage.swift */,
 				62C2C10C2BEB1072008B2D3F /* User.swift */,
 				62C2C10E2BEB108D008B2D3F /* AuthViewModel.swift */,
@@ -469,6 +472,7 @@
 				62C2C1312BEB1227008B2D3F /* SwipePage.swift in Sources */,
 				62C2C13F2BEB12C2008B2D3F /* CombinedPostDetailView.swift in Sources */,
 				62C2C11B2BEB1120008B2D3F /* SettingsPage.swift in Sources */,
+				2EF5DC492BF1A59300BA3321 /* BrandInterest.swift in Sources */,
 				62C2C1252BEB11AC008B2D3F /* DMViewModel.swift in Sources */,
 				62C2C1232BEB1199008B2D3F /* DM_Page.swift in Sources */,
 				62C2C1272BEB11C9008B2D3F /* NewMessageView.swift in Sources */,
@@ -660,7 +664,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.3;
@@ -668,7 +672,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = TailorMade.TailorMade;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -698,7 +703,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.3;
@@ -706,7 +711,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = TailorMade.TailorMade;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
