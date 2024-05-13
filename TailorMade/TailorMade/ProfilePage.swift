@@ -149,16 +149,6 @@ struct ProfileHeaderView: View {
                         .foregroundColor(.gray)
                         .font(.footnote)
                 }
-                VStack(alignment: .center){
-                    Text("\(followersCount)")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 2)
-                    Text("Followers")
-                        .foregroundColor(.gray)
-                        .font(.footnote)
-                }
-                
                 
                 Spacer()
             }

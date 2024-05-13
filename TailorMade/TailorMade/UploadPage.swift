@@ -114,7 +114,6 @@ struct UploadPage: View {
                         .stroke(Color.blue, lineWidth: 2)
                 )
             }
-            .navigationBarTitle("New Post", displayMode: .inline)
             .padding()
             .background(Color.white)
             .cornerRadius(20)

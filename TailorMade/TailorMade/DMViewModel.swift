@@ -90,78 +90,68 @@ class DMViewModel: ObservableObject {
             }
         }
     }
-//    func sendNewMessage(receiverId: String, content: String) {
-//          guard let senderId = Auth.auth().currentUser?.uid else {
-//              print("Error: Sender ID (current user ID) is not available.")
-//              return
-//          }
-//
-//          // Create data for a new conversation
-//          let conversationData: [String: Any] = [
-//              "participants": [senderId, receiverId],
-//              // Include any other conversation details as needed
-//          ]
-//
-//          // Add the new conversation to Firestore
-//          var ref: DocumentReference? = nil
-//          ref = db.collection("conversations").addDocument(data: conversationData) { [weak self] error in
-//              if let error = error {
-//                  print("Error creating conversation: \(error.localizedDescription)")
-//                  return
-//              }
-//
-//              guard let newConversationId = ref?.documentID else {
-//                  print("Failed to retrieve new conversation ID after creation.")
-//                  return
-//              }
-//
-//              // Set the new conversation ID
-//              self?.conversationId = newConversationId
-//
-//              // Create a new ChatMessage object
-//              let newMessage = ChatMessage(senderId: senderId, receiverId: receiverId, content: content, timestamp: Timestamp(date: Date()))
-//
-//              // Send the message to the newly created conversation
-//              self?.sendMessageToConversation(conversationId: newConversationId, message: newMessage)
-//          }
-//      }
-    func sendNewMessage(receiverId: String, content: String) {
+
+    func sendNewMessage(receiverEmail: String, content: String) {
         guard let senderId = Auth.auth().currentUser?.uid else {
             print("Error: Sender ID (current user ID) is not available.")
             return
         }
-        
-        let conversationData: [String: Any] = ["participants": [senderId, receiverId]]
-        
-        // Create the conversation in Firestore
-        db.collection("conversations").addDocument(data: conversationData) { [weak self] ref, error in
+
+        // First, find the receiver's user ID by their email
+        db.collection("users").whereField("email", isEqualTo: receiverEmail).getDocuments { [weak self] (querySnapshot, error) in
             if let error = error {
-                print("Error creating conversation: \(error.localizedDescription)")
+                print("Error finding user by email: \(error.localizedDescription)")
                 return
             }
-            
-            // Successfully created a new conversation, now retrieve the newConversationId
-            let newConversationId = ref!.documentID // Safe to use `!` as ref would be non-nil if error is nil
-            
-            // Update the conversation ID for future use
-            self?.conversationId = newConversationId
-            
-            // Create a new ChatMessage object
-            let newMessage = ChatMessage(senderId: senderId, receiverId: receiverId, content: content, timestamp: Timestamp(date: Date()))
-            
-            // Send the message to the newly created conversation
-            self?.sendMessageToConversation(conversationId: newConversationId, message: newMessage)
+
+            guard let documents = querySnapshot?.documents, !documents.isEmpty else {
+                print("No users found with that email")
+                return
+            }
+
+            let receiverId = documents.first!.documentID
+
+            // Data model for a new conversation.
+            let conversationData: [String: Any] = [
+                "participants": [senderId, receiverId],
+                "lastMessage": content,
+                "timestamp": FieldValue.serverTimestamp()
+            ]
+
+            // Adding the new conversation document to Firestore.
+            let conversationRef = self?.db.collection("conversations").document()
+            conversationRef?.setData(conversationData) { error in
+                if let error = error {
+                    print("Error creating conversation: \(error.localizedDescription)")
+                    return
+                }
+
+                // If the conversation is successfully created, send the first message.
+                self?.sendFirstMessage(to: conversationRef!.documentID, senderId: senderId, receiverId: receiverId, content: content)
+            }
+        }
+    }
+
+    func sendFirstMessage(to conversationId: String, senderId: String, receiverId: String, content: String) {
+        let messageData: [String: Any] = [
+            "senderId": senderId,
+            "receiverId": receiverId,
+            "content": content,
+            "timestamp": FieldValue.serverTimestamp()
+        ]
+
+        // Adding the message to the newly created conversation
+        db.collection("conversations").document(conversationId).collection("messages").addDocument(data: messageData) { error in
+            if let error = error {
+                print("Error sending message: \(error.localizedDescription)")
+            } else {
+                print("Message successfully sent to user \(receiverId)")
+            }
         }
     }
 
 
-    private func sendMessageToConversation(conversationId: String, message: ChatMessage) {
-          do {
-              try db.collection("conversations").document(conversationId).collection("messages").addDocument(from: message)
-          } catch {
-              print("Error sending message: \(error.localizedDescription)")
-          }
-      }
+
     // Private function to create a notification for the receiving user when a message is sent.
     private func createNotificationForReceiver(_ receiverId: String, content: String) {
         let notificationData: [String: Any] = [
@@ -182,3 +172,4 @@ class DMViewModel: ObservableObject {
         }
     }
 }
+
